@@ -1,14 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geometry2/pages/page_1.dart';
-import 'package:geometry2/pages/page_2.dart';
-import 'package:geometry2/pages/page_3.dart';
-import 'package:geometry2/pages/page_4.dart';
-import 'package:geometry2/pages/page_5.dart';
-import 'package:geometry2/pages/page_6.dart';
-import 'package:geometry2/pages/figures/triangle.dart';
-import 'package:geometry2/pages/figures/circle.dart';
-import 'package:geometry2/pages/figures/square.dart';
-import 'package:geometry2/pages/figures/star.dart';
+import 'package:geometry2/components/bottom_nav_bar.dart';
+import 'package:geometry2/pages/cartPage.dart';
+import 'package:geometry2/pages/informationPage.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,194 +10,52 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int level = 1;
-  int score = 0;
-  Color? backgroundColor = Colors.deepPurple[200]; // Default background color
 
-  final List<Color> colorChoices = [
-    Colors.red,
-    Colors.orange,
-    Colors.yellow,
-    Colors.green,
-    Colors.blue,
-    Colors.deepPurple[200]!,
-  ];
-
-  int currentColorIndex = 4; // Index of the default color in the colorChoices list
-
-  void changeBackgroundColor() {
+  int _selectedIndex=0;
+  void navigateBottomBar(int newIndex){
     setState(() {
-      currentColorIndex = (currentColorIndex + 1) % colorChoices.length;
-      backgroundColor = colorChoices[currentColorIndex];
+      _selectedIndex = newIndex;
     });
   }
 
+  final List<Widget> _pages = [
+
+    const InformationPage(),
+
+    const CartPage(),
+  
+  ];
+
   @override
   Widget build(BuildContext context) {
+    // TODO: implement build
     return Scaffold(
-      backgroundColor: backgroundColor,
-      body: Column(
-        children: [
-          // Buttons to choose background color
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: colorChoices.map((color) {
-                return ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      backgroundColor = color;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: color,
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.all(16),
-                  ),
-                  child: SizedBox(),
-                );
-              }).toList(),
-            ),
-          ),
-
-          // Display level and score at the top
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Level: $level',
-                  style: TextStyle(fontSize: 20),
-                ),
-                Text(
-                  'Score: $score',
-                  style: TextStyle(fontSize: 20),
-                ),
-              ],
-            ),
-          ),
-
-          // Pages on the same row
-          Container(
-            height: 150, // Adjust the height as needed
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Triangle(),
-                        ),
-                      );
-                    },
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Page1(),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Circle(),
-                        ),
-                      );
-                    },
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Page2(),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Square(),
-                        ),
-                      );
-                    },
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Page3(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Page4, Page5, Page6 below Page1
-          Container(
-            height: 150, // Adjust the height as needed
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Triangle(),
-                        ),
-                      );
-                    },
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Page4(),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Triangle(),
-                        ),
-                      );
-                    },
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Page5(),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Triangle(),
-                        ),
-                      );
-                    },
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Page6(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // dot indicators
-          // (Place the SmoothPageIndicator here as needed)
-        ],
+      backgroundColor: Color.fromARGB(255, 162, 233, 223),
+      bottomNavigationBar: MyBottomNavBar(
+        onTabChange: (index) => navigateBottomBar(index),
       ),
-    );
+      body: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: EdgeInsets.all(30.0),
+          child: Text(
+            //including username 
+            "Let's play Name !",
+            style: TextStyle(
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'GloriaHallelujah',
+              color: Colors.white,
+            ),
+          ),
+        ),
+        Expanded(
+          child: _pages[_selectedIndex],
+        ),
+      ],
+    ),
+  );
   }
+
 }

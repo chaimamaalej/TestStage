@@ -24,7 +24,7 @@ class _GameScreenState extends State<GameScreen> {
   List<Offset> userDots = [];
   int score = 0;
 
-  final List<Offset> connectDots = generateDottedCircle(20, 150.0);
+  final List<Offset> connectDots = generateDottedCircle(20, 130.0);
 
   void onUserDraw(Offset userDot) {
     for (int i = 0; i < connectDots.length; i++) {
@@ -84,9 +84,7 @@ class _GameScreenState extends State<GameScreen> {
         },
         onPanEnd: (details) {
           // Reset the dots after the user completes a drawing
-          setState(() {
-            userDots.clear();
-          });
+          
         },
         child: Stack(
           children: [

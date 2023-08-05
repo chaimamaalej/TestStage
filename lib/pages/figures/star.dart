@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(Star());
+  runApp(StarGame());
 }
 
-class Star extends StatelessWidget {
+class StarGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,7 +24,7 @@ class _GameScreenState extends State<GameScreen> {
   List<Offset> userDots = [];
   int score = 0;
 
-  final List<Offset> connectDots = generateDottedCircle(20, 150.0);
+  final List<Offset> connectDots = generateDottedStar(30, 140.0);
 
   void onUserDraw(Offset userDot) {
     for (int i = 0; i < connectDots.length; i++) {
@@ -45,12 +45,12 @@ class _GameScreenState extends State<GameScreen> {
         connectedDots++;
       }
     }
-    // Check if the last and first dots are connected (forming a closed circle)
+    // Check if the last and first dots are connected (forming a closed star)
     if (isNeighborDot(userDots.last, userDots.first)) {
       connectedDots++;
     }
 
-    score = connectedDots;
+    score = connectedDots ~/ 2; // Divide by 2 as each line connects two dots
   }
 
   bool isNeighborDot(Offset p1, Offset p2) {
@@ -76,7 +76,7 @@ class _GameScreenState extends State<GameScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dot Connect Game'),
+        title: Text('Dot Connect Game - Star'),
       ),
       body: GestureDetector(
         onPanUpdate: (details) {
@@ -84,9 +84,7 @@ class _GameScreenState extends State<GameScreen> {
         },
         onPanEnd: (details) {
           // Reset the dots after the user completes a drawing
-          setState(() {
-            userDots.clear();
-          });
+          
         },
         child: Stack(
           children: [
@@ -151,7 +149,7 @@ class DotPainter extends CustomPainter {
     }
 
     dotPaint.color = Colors.red; // Set color to red for the lines
-    for (int i = 0; i < userDots.length - 1; i++) {
+    for (int i = 0; i < userDots.length - 1; i += 2) {
       canvas.drawLine(userDots[i], userDots[i + 1], dotPaint);
     }
   }
@@ -162,16 +160,24 @@ class DotPainter extends CustomPainter {
   }
 }
 
-List<Offset> generateDottedCircle(int numberOfDots, double radius) {
+List<Offset> generateDottedStar(int numberOfDots, double radius) {
   List<Offset> dots = [];
-  double centerX = 200.0;
-  double centerY = 200.0;
+  double centerX = 200.0; // Adjust this value to center the star horizontally
+  double centerY = 200.0; // Adjust this value to center the star vertically
 
-  for (int i = 0; i < numberOfDots; i++) {
-    double angle = (2 * pi / numberOfDots) * i;
-    double x = centerX + radius * cos(angle);
-    double y = centerY + radius * sin(angle);
-    dots.add(Offset(x, y));
+  // Calculate the angles between the dots in the star
+  double angleIncrement = 2 * pi / 5;
+
+  for (int i = 0; i < 5; i++) {
+    double outerAngle = angleIncrement * i;
+    double outerX = centerX + radius * cos(outerAngle);
+    double outerY = centerY + radius * sin(outerAngle);
+    dots.add(Offset(outerX, outerY));
+
+    double innerAngle = outerAngle + angleIncrement / 2;
+    double innerX = centerX + radius / 2 * cos(innerAngle);
+    double innerY = centerY + radius / 2 * sin(innerAngle);
+    dots.add(Offset(innerX, innerY));
   }
 
   return dots;

@@ -24,7 +24,7 @@ class _GameScreenState extends State<GameScreen> {
   List<Offset> userDots = [];
   int score = 0;
 
-  final List<Offset> connectDots = generateDottedCircle(20, 150.0);
+  final List<Offset> connectDots = generateDottedSquare(6, 200.0);
 
   void onUserDraw(Offset userDot) {
     for (int i = 0; i < connectDots.length; i++) {
@@ -45,7 +45,7 @@ class _GameScreenState extends State<GameScreen> {
         connectedDots++;
       }
     }
-    // Check if the last and first dots are connected (forming a closed circle)
+    // Check if the last and first dots are connected (forming a closed square)
     if (isNeighborDot(userDots.last, userDots.first)) {
       connectedDots++;
     }
@@ -76,7 +76,7 @@ class _GameScreenState extends State<GameScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dot Connect Game'),
+        title: Text('Dot Connect Game - Square'),
       ),
       body: GestureDetector(
         onPanUpdate: (details) {
@@ -84,9 +84,7 @@ class _GameScreenState extends State<GameScreen> {
         },
         onPanEnd: (details) {
           // Reset the dots after the user completes a drawing
-          setState(() {
-            userDots.clear();
-          });
+         
         },
         child: Stack(
           children: [
@@ -162,16 +160,37 @@ class DotPainter extends CustomPainter {
   }
 }
 
-List<Offset> generateDottedCircle(int numberOfDots, double radius) {
+List<Offset> generateDottedSquare(int numberOfDots, double sideLength) {
   List<Offset> dots = [];
-  double centerX = 200.0;
-  double centerY = 200.0;
+  double startX = 100.0;
+  double startY = 100.0;
 
+  // Top side dots
   for (int i = 0; i < numberOfDots; i++) {
-    double angle = (2 * pi / numberOfDots) * i;
-    double x = centerX + radius * cos(angle);
-    double y = centerY + radius * sin(angle);
-    dots.add(Offset(x, y));
+    double fraction = i / (numberOfDots - 1);
+    double x = startX + sideLength * fraction;
+    dots.add(Offset(x, startY));
+  }
+
+  // Right side dots
+  for (int i = 1; i < numberOfDots; i++) {
+    double fraction = i / (numberOfDots - 1);
+    double y = startY + sideLength * fraction;
+    dots.add(Offset(startX + sideLength, y));
+  }
+
+  // Bottom side dots
+  for (int i = numberOfDots - 2; i >= 0; i--) {
+    double fraction = i / (numberOfDots - 1);
+    double x = startX + sideLength * fraction;
+    dots.add(Offset(x, startY + sideLength));
+  }
+
+  // Left side dots
+  for (int i = numberOfDots - 2; i > 0; i--) {
+    double fraction = i / (numberOfDots - 1);
+    double y = startY + sideLength * fraction;
+    dots.add(Offset(startX, y));
   }
 
   return dots;
