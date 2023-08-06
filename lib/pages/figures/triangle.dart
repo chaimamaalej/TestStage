@@ -30,7 +30,7 @@ class _GameScreenState extends State<GameScreen> {
   int dotsConnected = 0;
   Timer? timer;
   int secondsElapsed = 0;
-  double percentage =0.00;
+  double percentage = 0.00;
   int totalConnectedDots = 0;
 
   @override
@@ -40,7 +40,6 @@ class _GameScreenState extends State<GameScreen> {
         generateDottedTriangle(20, 200.0); // Initialize connectDots here
   }
 
- 
   void onUserDraw(Offset userDot) {
     if (!isDrawing) {
       isDrawing = true;
@@ -53,10 +52,13 @@ class _GameScreenState extends State<GameScreen> {
           userDots.add(connectDots[i]);
           totalConnectedDots++; // Increment total connected dots
         });
+        setState(() {
+          score++;
+        });
+        checkScore(); // Call checkScore after each successful connection
         break;
       }
     }
-    checkScore();
   }
 
   void startTimer() {
@@ -67,27 +69,25 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
-  
   void checkScore() {
-  int connectedDots = 0;
-  for (int i = 0; i < userDots.length - 1; i++) {
-    if (isNeighborDot(userDots[i], userDots[i + 1])) {
+    int connectedDots = 0;
+    for (int i = 0; i < userDots.length - 1; i++) {
+      if (isNeighborDot(userDots[i], userDots[i + 1])) {
+        connectedDots++;
+      }
+    }
+
+    // Check if the last and first dots are connected (forming a closed circle)
+    if (isNeighborDot(userDots.last, userDots.first)) {
       connectedDots++;
     }
+
+    score = connectedDots;
+
+    if (dotsConnected == connectDots.length) {
+      stopTimer();
+    }
   }
-
-  // Check if the last and first dots are connected (forming a closed circle)
-  if (isNeighborDot(userDots.last, userDots.first)) {
-    connectedDots++;
-  }
-
-  score = connectedDots;
-
-  if (dotsConnected == connectDots.length) {
-    stopTimer();
-  }
-}
-
 
   void stopTimer() {
     timer?.cancel();
@@ -115,8 +115,7 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    dotsConnected =
-        userDots.toSet().intersection(connectDots.toSet()).length;
+    dotsConnected = userDots.toSet().intersection(connectDots.toSet()).length;
     percentage = dotsConnected * 100 / connectDots.length;
 
     return Scaffold(

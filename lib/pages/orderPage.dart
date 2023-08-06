@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../models/figures.dart';
 import 'figures/circle.dart';
+import 'figures/spiral.dart';
 import 'figures/square.dart';
 import 'figures/star.dart';
 import 'figures/triangle.dart';
@@ -175,7 +176,7 @@ class _OrderPageState extends State<OrderPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Triangle(),
+                          builder: (context) => SpiralPage(),
                         ),
                       );
                     },

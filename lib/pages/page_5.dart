@@ -20,7 +20,7 @@ class Page5 extends StatelessWidget {
             child: Container(
               color: Colors.white,
               child: Center(
-                child: Star(),
+                child: Spiral(),
               ),
             ),
           ),
@@ -30,7 +30,7 @@ class Page5 extends StatelessWidget {
   }
 }
 
-class Star extends StatelessWidget {
+class Spiral extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,7 +40,7 @@ class Star extends StatelessWidget {
         children: [
           Positioned.fill(
             child: CustomPaint(
-              painter: StarPainter(),
+              painter: SpiralPainter(),
             ),
           ),
         ],
@@ -49,39 +49,29 @@ class Star extends StatelessWidget {
   }
 }
 
-class StarPainter extends CustomPainter {
+class SpiralPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
       ..color = Colors.black
-      ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0; // Increase the stroke width for a thicker line
 
-    final double halfWidth = size.width / 2;
-    final double halfHeight = size.height / 2;
-    final double centerX = halfWidth;
-    final double centerY = halfHeight;
+    final double centerX = size.width / 2;
+    final double centerY = size.height / 2;
 
-    final double outerRadius = halfWidth;
-    final double innerRadius = halfWidth / 2;
-    final double rotation = -pi / 2;
-    final double step = pi / 5;
+    final double startRadius = 0.0;
+    final double spacing = 1.0;
+    final double rotationRate = 2.0;
+    final int numberOfDots = 100;
 
     final Path path = Path();
-    for (int i = 0; i < 5; i++) {
-      double angle = rotation + i * 2 * step;
-      double outerX = centerX + outerRadius * cos(angle);
-      double outerY = centerY + outerRadius * sin(angle);
-      double innerAngle = angle + step;
-      double innerX = centerX + innerRadius * cos(innerAngle);
-      double innerY = centerY + innerRadius * sin(innerAngle);
-      if (i == 0) {
-        path.moveTo(outerX, outerY);
-      } else {
-        path.lineTo(outerX, outerY);
-      }
-      path.lineTo(innerX, innerY);
+    List<Offset> dots = generateDottedSpiral(numberOfDots, startRadius, spacing, rotationRate);
+
+    path.moveTo(centerX, centerY);
+    for (Offset dot in dots) {
+      path.lineTo(dot.dx, dot.dy);
     }
-    path.close();
 
     canvas.drawPath(path, paint);
   }
@@ -90,4 +80,26 @@ class StarPainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) {
     return false;
   }
+
+  List<Offset> generateDottedSpiral(int numberOfDots, double startRadius, double spacing, double rotationRate) {
+    List<Offset> dots = [];
+    double centerX = 200.0; // Adjust this value to center the spiral horizontally
+    double centerY = 200.0; // Adjust this value to center the spiral vertically
+
+    double angleIncrement = 2 * pi * rotationRate / numberOfDots;
+    double radius = startRadius;
+
+    for (int i = 0; i < numberOfDots; i++) {
+      double angle = angleIncrement * i;
+      double x = centerX + radius * cos(angle);
+      double y = centerY + radius * sin(angle);
+      dots.add(Offset(x, y));
+
+      radius += spacing;
+    }
+
+    return dots;
+  }
 }
+
+
