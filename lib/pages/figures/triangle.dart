@@ -43,7 +43,6 @@ class _GameScreenState extends State<GameScreen> {
   void onUserDraw(Offset userDot) {
     if (!isDrawing) {
       isDrawing = true;
-      startTimer();
     }
 
     for (int i = 0; i < connectDots.length; i++) {
@@ -91,6 +90,7 @@ class _GameScreenState extends State<GameScreen> {
 
   void stopTimer() {
     timer?.cancel();
+    timer = null;
   }
 
   bool isNeighborDot(Offset p1, Offset p2) {
@@ -104,16 +104,15 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void resetGame() {
-    timer?.cancel();
-    // setState(() {
-
-    //   // isDrawing = false;
-    //   // dotsConnected=0;
-    //   // userDots.clear();
-    //   // score = 0;
-    //   // secondsElapsed = 0;
-    //   // totalConnectedDots=0;
-    // });
+    stopTimer();
+    setState(() {
+      isDrawing = false;
+      dotsConnected=0;
+      userDots.clear();
+      score = 0;
+      secondsElapsed = 0;
+      totalConnectedDots=0;
+    });
   }
 
   @override
@@ -130,8 +129,10 @@ class _GameScreenState extends State<GameScreen> {
           if (!isDrawing) {
             setState(() {
               isDrawing = true; // Start drawing
-              startTimer();
-            });
+           });
+          }
+          if (timer == null) {
+            startTimer();
           }
           onUserDraw(details.localPosition);
         },
