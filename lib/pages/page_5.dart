@@ -34,16 +34,10 @@ class Spiral extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100,
-      height: 100,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(
-              painter: SpiralPainter(),
-            ),
-          ),
-        ],
+      width: 200,
+      height: 200,
+      child: CustomPaint(
+        painter: SpiralPainter(),
       ),
     );
   }
@@ -55,22 +49,22 @@ class SpiralPainter extends CustomPainter {
     final Paint paint = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0; // Increase the stroke width for a thicker line
+      ..strokeWidth = 2.0;
 
     final double centerX = size.width / 2;
     final double centerY = size.height / 2;
 
     final double startRadius = 0.0;
-    final double spacing = 1.0;
+    final double spacing = 0.2;
     final double rotationRate = 2.0;
-    final int numberOfDots = 100;
+    final int numberOfDots = 200;
 
     final Path path = Path();
     List<Offset> dots = generateDottedSpiral(numberOfDots, startRadius, spacing, rotationRate);
 
-    path.moveTo(centerX, centerY);
+    path.moveTo(centerX + dots[0].dx, centerY + dots[0].dy);
     for (Offset dot in dots) {
-      path.lineTo(dot.dx, dot.dy);
+      path.lineTo(centerX + dot.dx, centerY + dot.dy);
     }
 
     canvas.drawPath(path, paint);
@@ -83,16 +77,13 @@ class SpiralPainter extends CustomPainter {
 
   List<Offset> generateDottedSpiral(int numberOfDots, double startRadius, double spacing, double rotationRate) {
     List<Offset> dots = [];
-    double centerX = 200.0; // Adjust this value to center the spiral horizontally
-    double centerY = 200.0; // Adjust this value to center the spiral vertically
-
     double angleIncrement = 2 * pi * rotationRate / numberOfDots;
     double radius = startRadius;
 
     for (int i = 0; i < numberOfDots; i++) {
       double angle = angleIncrement * i;
-      double x = centerX + radius * cos(angle);
-      double y = centerY + radius * sin(angle);
+      double x = radius * cos(angle);
+      double y = radius * sin(angle);
       dots.add(Offset(x, y));
 
       radius += spacing;
@@ -102,4 +93,15 @@ class SpiralPainter extends CustomPainter {
   }
 }
 
-
+void main() {
+  runApp(
+    MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Spiral(),
+        ),
+      ),
+    ),
+  );
+}

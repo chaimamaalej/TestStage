@@ -4,25 +4,29 @@ import 'figures.dart';
 
 class BubbleTeaShop extends ChangeNotifier{
 
-  final List<Figures> _shop = [
+  final List<Items> _shop = [
 
-    Figures(
-      name: "Figures",
+    Items(
+      name: "Let's play",
       imagePath: "lib/images/triangle.png", ),
+    Items(
+      name: "Reviews",
+      imagePath: "lib/images/triangle.png", ),
+
   ];
 
-  final List<Figures> _userCart = [];
+  final List<Items> _userCart = [];
 
-  List<Figures> get shop => _shop;
+  List<Items> get shop => _shop;
 
-  List<Figures> get cart => _userCart;
+  List<Items> get cart => _userCart;
 
-  void addToCart(Figures figures){
+  void addToCart(Items figures){
     _userCart.add(figures);
     notifyListeners();
   }
 
-  void removeFromCart(Figures figures){
+  void removeFromCart(Items figures){
     _userCart.remove(figures);
     notifyListeners();
   }

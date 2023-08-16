@@ -15,7 +15,7 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
 
   // remove drink from cart
-  void removeFromCart(Figures figures){
+  void removeFromCart(Items figures){
     Provider.of<BubbleTeaShop>(context, listen: false).removeFromCart(figures);
   }
 
@@ -38,7 +38,7 @@ class _CartPageState extends State<CartPage> {
                 itemCount: value.cart.length,
                 itemBuilder: (context, index) {
                   //get individual drink in cart first
-                  Figures figures = value.cart[index];
+                  Items figures = value.cart[index];
 
                   //return as a nice tile
                   return FiguresTile(

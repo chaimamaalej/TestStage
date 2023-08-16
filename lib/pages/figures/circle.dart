@@ -1,5 +1,6 @@
 import 'dart:math';
-
+import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -23,19 +24,47 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   List<Offset> userDots = [];
   int score = 0;
+  Timer? timer;
+  int secondsElapsed = 0;
+  bool isDrawing = false;
+  List<Offset> connectDots = []; // Move this line here
+  int dotsConnected = 0;
+  int totalConnectedDots = 0;
 
-  final List<Offset> connectDots = generateDottedCircle(20, 130.0);
+
+  @override
+  void initState() {
+    super.initState();
+    connectDots =
+        generateDottedCircle(20, 130.0); // Initialize connectDots here
+  }
 
   void onUserDraw(Offset userDot) {
+    if (!isDrawing) {
+      isDrawing = true;
+      startTimer();
+    }
     for (int i = 0; i < connectDots.length; i++) {
       if ((userDot - connectDots[i]).distance < 25.0) {
         setState(() {
           userDots.add(connectDots[i]);
+          totalConnectedDots++;
         });
+         setState(() {
+          score++;
+        });
+        checkScore(); // Call checkScore after each successful connection
         break;
       }
     }
-    checkScore();
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+      setState(() {
+        secondsElapsed += 100; // Increment by 100 milliseconds
+      });
+    });
   }
 
   void checkScore() {
@@ -51,11 +80,20 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     score = connectedDots;
+    
+    if (dotsConnected == connectDots.length) {
+      stopTimer();
+    }
+  }
+
+  void stopTimer() {
+    timer?.cancel();
   }
 
   bool isNeighborDot(Offset p1, Offset p2) {
     for (int i = 0; i < connectDots.length; i++) {
-      if ((p1 - connectDots[i]).distance < 25.0 && (p2 - connectDots[i]).distance < 25.0) {
+      if ((p1 - connectDots[i]).distance < 25.0 &&
+          (p2 - connectDots[i]).distance < 25.0) {
         return true;
       }
     }
@@ -63,15 +101,19 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void resetGame() {
+    stopTimer();
     setState(() {
       userDots.clear();
       score = 0;
+      secondsElapsed = 0;
+      isDrawing = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    int dotsConnected = userDots.toSet().intersection(connectDots.toSet()).length;
+    int dotsConnected =
+        userDots.toSet().intersection(connectDots.toSet()).length;
     double percentage = dotsConnected * 100 / connectDots.length;
 
     return Scaffold(
@@ -84,7 +126,6 @@ class _GameScreenState extends State<GameScreen> {
         },
         onPanEnd: (details) {
           // Reset the dots after the user completes a drawing
-          
         },
         child: Stack(
           children: [
@@ -109,6 +150,10 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     Text(
                       'Percentage: ${percentage.toStringAsFixed(2)}%',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      'Time Elapsed: ${secondsElapsed / 1000} seconds',
                       style: TextStyle(fontSize: 18),
                     ),
                   ],

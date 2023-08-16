@@ -14,7 +14,7 @@ class InformationPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<InformationPage> {
-  void goToOrderPage(Figures figures) {
+  void goToOrderPage(Items figures) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -32,10 +32,7 @@ class _CartPageState extends State<InformationPage> {
           padding: const EdgeInsets.all(25.0),
           child: Column(
             children: [
-              Text(
-                "Figures",
-                style: TextStyle(fontSize: 20),
-              ),
+              
 
               const SizedBox(height: 10),
 
@@ -44,7 +41,7 @@ class _CartPageState extends State<InformationPage> {
                 child: ListView.builder(
                   itemCount: value.shop.length,
                   itemBuilder: (context, index) {
-                    Figures individualFigure = value.shop[index];
+                    Items individualFigure = value.shop[index];
 
                     return FiguresTile(
                       figures: individualFigure,

@@ -2,9 +2,11 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io';
 
 void main() {
   runApp(SpiralPage());
+  print("Your message here");
 }
 
 class SpiralPage extends StatelessWidget {
@@ -46,7 +48,7 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     for (int i = 0; i < connectDots.length; i++) {
-      if ((userDot - connectDots[i]).distance < 25.0) {
+      if ((userDot - connectDots[i]).distance < 10.0) {
         setState(() {
           userDots.add(connectDots[i]);
           totalConnectedDots++; // Increment total connected dots
@@ -68,28 +70,34 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  void resetTimer() {
+    if (timer != null && timer!.isActive) {
+      timer!.cancel();
+    }
+    startTimer();
+  }
+
   void checkScore() {
-    int connectedDots = 0;
-    for (int i = 0; i < userDots.length - 1; i++) {
-      if (isNeighborDot(userDots[i], userDots[i + 1])) {
-        connectedDots++;
+    Set<Offset> connectedSet = userDots.toSet();
+
+    bool allDotsConnected = true;
+    for (Offset dot in connectDots) {
+      if (!connectedSet.contains(dot)) {
+        allDotsConnected = false;
+        break;
       }
     }
 
-    // Check if the last and first dots are connected (forming a closed circle)
-    if (isNeighborDot(userDots.last, userDots.first)) {
-      connectedDots++;
-    }
-
-    score = connectedDots;
-
-    if (dotsConnected == connectDots.length) {
+    if (allDotsConnected) {
       stopTimer();
+    } else {
+      dotsConnected = connectedSet.length;
     }
   }
 
   void stopTimer() {
     timer?.cancel();
+    
   }
 
   bool isNeighborDot(Offset p1, Offset p2) {
@@ -165,6 +173,10 @@ class _GameScreenState extends State<GameScreen> {
                       'Time Elapsed: ${secondsElapsed / 1000} seconds',
                       style: TextStyle(fontSize: 18),
                     ),
+                    Text(
+                      'Drawing: $isDrawing',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ],
                 ),
               ),
@@ -179,9 +191,11 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  List<Offset> generateDottedSpiral(int numberOfDots, double startRadius, double spacing, double rotationRate) {
+  List<Offset> generateDottedSpiral(int numberOfDots, double startRadius,
+      double spacing, double rotationRate) {
     List<Offset> dots = [];
-    double centerX = 200.0; // Adjust this value to center the spiral horizontally
+    double centerX =
+        200.0; // Adjust this value to center the spiral horizontally
     double centerY = 200.0; // Adjust this value to center the spiral vertically
 
     double angleIncrement = 2 * pi * rotationRate / numberOfDots;
@@ -210,8 +224,8 @@ class DotPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Paint dotPaint = Paint()
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round;
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.butt;
 
     for (Offset connectDot in connectDots) {
       if (userDots.contains(connectDot)) {

@@ -104,13 +104,16 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void resetGame() {
-    stopTimer();
-    setState(() {
-      userDots.clear();
-      score = 0;
-      secondsElapsed = 0;
-      isDrawing = false;
-    });
+    timer?.cancel();
+    // setState(() {
+
+    //   // isDrawing = false;
+    //   // dotsConnected=0;
+    //   // userDots.clear();
+    //   // score = 0;
+    //   // secondsElapsed = 0;
+    //   // totalConnectedDots=0;
+    // });
   }
 
   @override
@@ -134,7 +137,8 @@ class _GameScreenState extends State<GameScreen> {
         },
         onPanEnd: (details) {
           setState(() {
-            isDrawing = false; // Reset drawing state
+            isDrawing = false;
+            // Reset drawing state
           });
         },
         child: Stack(

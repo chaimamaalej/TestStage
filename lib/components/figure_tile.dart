@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/figures.dart';
 
 class FiguresTile extends StatelessWidget {
-  final Figures figures;
+  final Items figures;
   void Function()? onTap;
   final Widget trailing;
   FiguresTile({
