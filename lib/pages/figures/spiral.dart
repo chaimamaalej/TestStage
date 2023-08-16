@@ -237,7 +237,7 @@ class DotPainter extends CustomPainter {
     }
 
     dotPaint.color = Colors.red; // Set color to red for the lines
-    for (int i = 0; i < userDots.length - 1; i += 2) {
+    for (int i = 0; i < userDots.length - 1; i += 1) {
       canvas.drawLine(userDots[i], userDots[i + 1], dotPaint);
     }
   }
