@@ -28,7 +28,7 @@ class _CartPageState extends State<CartPage> {
           children: [
             //heading
             const Text(
-              'Your Cart',
+              'Games played',
               style: TextStyle(fontSize: 20),
             ),
 
@@ -44,21 +44,13 @@ class _CartPageState extends State<CartPage> {
                   return FiguresTile(
                     figures: figures, 
                     onTap: () => removeFromCart(figures), 
-                    trailing: Icon(Icons.delete),
                     );
                 },
               ),
             ),
 
             //pay button
-            MaterialButton(
-              child: Text(
-                'PAY',
-                style: TextStyle(color: Colors.white),
-              ),
-              color: Colors.blue,
-              onPressed: () {},
-            )
+           
           ],
         ),
       ),

@@ -10,7 +10,7 @@ class BubbleTeaShop extends ChangeNotifier{
       name: "Let's play",
       imagePath: "lib/images/triangle.png", ),
     Items(
-      name: "Reviews",
+      name: "Medical Review",
       imagePath: "lib/images/triangle.png", ),
 
   ];
@@ -20,6 +20,8 @@ class BubbleTeaShop extends ChangeNotifier{
   List<Items> get shop => _shop;
 
   List<Items> get cart => _userCart;
+
+  get isMusicOn => null;
 
   void addToCart(Items figures){
     _userCart.add(figures);

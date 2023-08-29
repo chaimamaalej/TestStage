@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:geometry2/pages/figures/circle.dart';
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:quickalert/quickalert.dart';
 
 void main() {
   runApp(Triangle());
@@ -26,31 +28,62 @@ class _GameScreenState extends State<GameScreen> {
   List<Offset> userDots = [];
   int score = 0;
   bool isDrawing = false;
-  List<Offset> connectDots = []; // Move this line here
+  List<Offset> connectDots = [];
   int dotsConnected = 0;
   Timer? timer;
   int secondsElapsed = 0;
   double percentage = 0.00;
   int totalConnectedDots = 0;
+  int neighborDots = 0;
+  bool correctTriangleFormed = false;
+  late AudioPlayer audioPlayer;
+  String audioFilePath =
+      'assets/mixkit-a-happy-child-532.mp3'; // Replace with the actual path
 
   @override
   void initState() {
     super.initState();
-    connectDots =
-        generateDottedTriangle(20, 200.0); // Initialize connectDots here
+    connectDots = generateDottedTriangle(20, 200.0);
+    audioPlayer = AudioPlayer();
+    print('Audio player initialized');
+  }
+
+  void playAudio() async {
+    int result = await audioPlayer.play(audioFilePath, isLocal: true);
+
+    if (result == 1) {
+      // Success
+      print('Audio playing');
+    } else {
+      // Error
+      print('Error playing audio');
+    }
+  }
+
+  @override
+  void dispose() {
+    audioPlayer
+        .dispose(); // Dispose of the audio player when the widget is disposed
+    super.dispose();
   }
 
   void onUserDraw(Offset userDot) {
     if (!isDrawing) {
       isDrawing = true;
+      startTimer();
     }
 
     for (int i = 0; i < connectDots.length; i++) {
-      if ((userDot - connectDots[i]).distance < 25.0) {
+      if ((userDot - connectDots[i]).distance < 10.0) {
         setState(() {
           userDots.add(connectDots[i]);
           totalConnectedDots++; // Increment total connected dots
         });
+        if (isNeighborDot(userDots.last, userDots[userDots.length - 2])) {
+          neighborDots++; // Increment neighborDots count if connected to a neighbor
+        } else {
+          neighborDots--; // Decrement neighborDots count if not connected to a neighbor
+        }
         setState(() {
           score++;
         });
@@ -58,6 +91,7 @@ class _GameScreenState extends State<GameScreen> {
         break;
       }
     }
+    // Check if the dots connected by the user form a correct triangle
   }
 
   void startTimer() {
@@ -85,6 +119,7 @@ class _GameScreenState extends State<GameScreen> {
 
     if (dotsConnected == connectDots.length) {
       stopTimer();
+      _showDialog(context);
     }
   }
 
@@ -93,10 +128,30 @@ class _GameScreenState extends State<GameScreen> {
     timer = null;
   }
 
+  void _showDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Congratulations!"),
+          content: Text("You did great, well done!"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Next"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   bool isNeighborDot(Offset p1, Offset p2) {
     for (int i = 0; i < connectDots.length; i++) {
-      if ((p1 - connectDots[i]).distance < 25.0 &&
-          (p2 - connectDots[i]).distance < 25.0) {
+      if ((p1 - connectDots[i]).distance < 10.0 &&
+          (p2 - connectDots[i]).distance < 10.0) {
         return true;
       }
     }
@@ -107,11 +162,11 @@ class _GameScreenState extends State<GameScreen> {
     stopTimer();
     setState(() {
       isDrawing = false;
-      dotsConnected=0;
+      dotsConnected = 0;
       userDots.clear();
       score = 0;
       secondsElapsed = 0;
-      totalConnectedDots=0;
+      totalConnectedDots = 0;
     });
   }
 
@@ -129,9 +184,9 @@ class _GameScreenState extends State<GameScreen> {
           if (!isDrawing) {
             setState(() {
               isDrawing = true; // Start drawing
-           });
+            });
           }
-          if (timer == null) {
+          if ((timer == null) && (dotsConnected != connectDots.length)) {
             startTimer();
           }
           onUserDraw(details.localPosition);
@@ -170,6 +225,10 @@ class _GameScreenState extends State<GameScreen> {
                     Text(
                       'Time Elapsed: ${secondsElapsed / 1000} seconds',
                       style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      'neighbordots: $neighborDots',
+                      style: TextStyle(fontSize: 24),
                     ),
                   ],
                 ),

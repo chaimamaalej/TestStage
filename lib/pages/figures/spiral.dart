@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
+import 'package:quickalert/quickalert.dart';
 
 void main() {
   runApp(SpiralPage());
@@ -70,34 +71,31 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
-  void resetTimer() {
-    if (timer != null && timer!.isActive) {
-      timer!.cancel();
-    }
-    startTimer();
-  }
+
 
   void checkScore() {
-    Set<Offset> connectedSet = userDots.toSet();
-
-    bool allDotsConnected = true;
-    for (Offset dot in connectDots) {
-      if (!connectedSet.contains(dot)) {
-        allDotsConnected = false;
-        break;
+    int connectedDots = 0;
+    for (int i = 0; i < userDots.length - 1; i++) {
+      if (isNeighborDot(userDots[i], userDots[i + 1])) {
+        connectedDots++;
       }
     }
 
-    if (allDotsConnected) {
+    // Check if the last and first dots are connected (forming a closed circle)
+    if (isNeighborDot(userDots.last, userDots.first)) {
+      connectedDots++;
+    }
+
+    score = connectedDots;
+
+    if (dotsConnected == connectDots.length) {
       stopTimer();
-    } else {
-      dotsConnected = connectedSet.length;
     }
   }
 
   void stopTimer() {
     timer?.cancel();
-    
+    timer = null;
   }
 
   bool isNeighborDot(Offset p1, Offset p2) {
@@ -113,10 +111,12 @@ class _GameScreenState extends State<GameScreen> {
   void resetGame() {
     stopTimer();
     setState(() {
+      isDrawing = false;
+      dotsConnected=0;
       userDots.clear();
       score = 0;
       secondsElapsed = 0;
-      isDrawing = false;
+      totalConnectedDots=0;
     });
   }
 
@@ -134,8 +134,10 @@ class _GameScreenState extends State<GameScreen> {
           if (!isDrawing) {
             setState(() {
               isDrawing = true; // Start drawing
-              startTimer();
-            });
+           });
+          }
+          if ((timer == null) && (dotsConnected != connectDots.length)) {
+            startTimer();
           }
           onUserDraw(details.localPosition);
         },
@@ -173,10 +175,7 @@ class _GameScreenState extends State<GameScreen> {
                       'Time Elapsed: ${secondsElapsed / 1000} seconds',
                       style: TextStyle(fontSize: 18),
                     ),
-                    Text(
-                      'Drawing: $isDrawing',
-                      style: TextStyle(fontSize: 18),
-                    ),
+                    
                   ],
                 ),
               ),

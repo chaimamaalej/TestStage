@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 
 import '../components/figure_tile.dart';
 import '../models/figures.dart';
-import 'orderPage.dart';
+import 'games.dart';
+import 'medicalreview.dart';
+
 
 class InformationPage extends StatefulWidget {
   const InformationPage({Key? key}) : super(key: key);
@@ -15,14 +17,23 @@ class InformationPage extends StatefulWidget {
 
 class _CartPageState extends State<InformationPage> {
   void goToOrderPage(Items figures) {
+  if (figures.name == "Let's play") {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => OrderPage(
-        ),
+        builder: (context) => GamesPage(),
+      ),
+    );
+  } else if (figures.name == "Medical Review") {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MedicalReviewPage(), // Replace with the actual MedicalReviewPage widget
       ),
     );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +45,7 @@ class _CartPageState extends State<InformationPage> {
             children: [
               
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 80),
 
               // list of cart items
               Expanded(
@@ -46,7 +57,6 @@ class _CartPageState extends State<InformationPage> {
                     return FiguresTile(
                       figures: individualFigure,
                       onTap: () => goToOrderPage(individualFigure),
-                      trailing: Icon(Icons.arrow_forward),
                     );
                   },
                 ),

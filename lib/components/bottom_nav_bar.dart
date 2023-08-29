@@ -24,7 +24,7 @@ class MyBottomNavBar extends StatelessWidget {
         ),
         GButton(
           icon: Icons.games,
-          text: 'Played',
+          text: 'History',
         ),
       ],
     ),);

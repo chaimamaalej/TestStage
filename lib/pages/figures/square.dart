@@ -1,5 +1,6 @@
+import 'dart:async';
 import 'dart:math';
-
+import 'package:quickalert/quickalert.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -23,19 +24,48 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   List<Offset> userDots = [];
   int score = 0;
+  bool isDrawing = false;
+  List<Offset> connectDots = []; // Move this line here
+  int dotsConnected = 0;
+  Timer? timer;
+  int secondsElapsed = 0;
+  double percentage = 0.00;
+  int totalConnectedDots = 0;
 
-  final List<Offset> connectDots = generateDottedSquare(6, 200.0);
+  @override
+  void initState() {
+    super.initState();
+    connectDots =
+        generateDottedSquare(6, 200.0);// Initialize connectDots here
+  }
 
   void onUserDraw(Offset userDot) {
+    if (!isDrawing) {
+      isDrawing = true;
+      startTimer();
+    }
+
     for (int i = 0; i < connectDots.length; i++) {
       if ((userDot - connectDots[i]).distance < 25.0) {
         setState(() {
           userDots.add(connectDots[i]);
+          totalConnectedDots++; // Increment total connected dots
         });
+        setState(() {
+          score++;
+        });
+        checkScore(); // Call checkScore after each successful connection
         break;
       }
     }
-    checkScore();
+  }
+
+void startTimer() {
+    timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+      setState(() {
+        secondsElapsed += 100; // Increment by 100 milliseconds
+      });
+    });
   }
 
   void checkScore() {
@@ -45,17 +75,29 @@ class _GameScreenState extends State<GameScreen> {
         connectedDots++;
       }
     }
-    // Check if the last and first dots are connected (forming a closed square)
+
+    // Check if the last and first dots are connected (forming a closed circle)
     if (isNeighborDot(userDots.last, userDots.first)) {
       connectedDots++;
     }
 
     score = connectedDots;
+
+    if (dotsConnected == connectDots.length) {
+      stopTimer();
+    }
   }
+
+  void stopTimer() {
+    timer?.cancel();
+    timer = null;
+  }
+
 
   bool isNeighborDot(Offset p1, Offset p2) {
     for (int i = 0; i < connectDots.length; i++) {
-      if ((p1 - connectDots[i]).distance < 25.0 && (p2 - connectDots[i]).distance < 25.0) {
+      if ((p1 - connectDots[i]).distance < 10.0 &&
+          (p2 - connectDots[i]).distance < 10.0) {
         return true;
       }
     }
@@ -63,16 +105,22 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void resetGame() {
+    stopTimer();
     setState(() {
+      isDrawing = false;
+      dotsConnected=0;
       userDots.clear();
       score = 0;
+      secondsElapsed = 0;
+      totalConnectedDots=0;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    int dotsConnected = userDots.toSet().intersection(connectDots.toSet()).length;
-    double percentage = dotsConnected * 100 / connectDots.length;
+    dotsConnected = userDots.toSet().intersection(connectDots.toSet()).length;
+    percentage = dotsConnected * 100 / connectDots.length;
+
 
     return Scaffold(
       appBar: AppBar(
@@ -80,11 +128,21 @@ class _GameScreenState extends State<GameScreen> {
       ),
       body: GestureDetector(
         onPanUpdate: (details) {
+          if (!isDrawing) {
+            setState(() {
+              isDrawing = true; // Start drawing
+           });
+          }
+          if ((timer == null) && (dotsConnected != connectDots.length)) {
+            startTimer();
+          }
           onUserDraw(details.localPosition);
         },
         onPanEnd: (details) {
-          // Reset the dots after the user completes a drawing
-         
+          setState(() {
+            isDrawing = false;
+            // Reset drawing state
+          });
         },
         child: Stack(
           children: [
@@ -109,6 +167,10 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     Text(
                       'Percentage: ${percentage.toStringAsFixed(2)}%',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      'Time Elapsed: ${secondsElapsed / 1000} seconds',
                       style: TextStyle(fontSize: 18),
                     ),
                   ],
